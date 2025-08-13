@@ -19,6 +19,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/css/css.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/markdown/markdown.min.js"></script>
     
     <!-- CodeMirror Addons -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/hint/show-hint.min.js"></script>
@@ -97,6 +98,7 @@
         .group:hover .delete-asset-btn { display: block; }
         .delete-asset-btn:hover { background-color: rgba(239, 68, 68, 0.8); }
         .editor-panel-container { width: calc(100% - var(--sidebar-width)); }
+        #canvasView .CodeMirror { font-size: 16px; }
     </style>
 </head>
 <body class="bg-gray-900 text-white h-screen flex flex-col items-center justify-center p-0 md:p-4">
@@ -156,7 +158,7 @@
                 <div id="hubCanvasBtn" class="hub-card bg-gray-800 rounded-2xl p-8 cursor-pointer border border-gray-700 hover:border-indigo-500 flex flex-col items-center text-center">
                     <img src="https://raw.githubusercontent.com/juugboytv/Geminus/main/IMG_3958.jpg" alt="Canvas Icon" class="w-20 h-20 rounded-full mb-4 object-cover border-2 border-blue-500">
                     <h2 class="text-2xl font-bold">MAGOG Canvas</h2>
-                    <p class="text-gray-400 mt-2">Open the full Gemini Canvas for collaborative work.</p>
+                    <p class="text-gray-400 mt-2">A collaborative space for writing and brainstorming.</p>
                 </div>
             </main>
              <footer class="text-center mt-12">
@@ -173,8 +175,28 @@
                 <h1 class="text-2xl font-bold">MAGOG Canvas</h1>
             </div>
         </header>
-        <main class="flex-grow bg-gray-900">
-            <iframe id="canvasFrame" class="w-full h-full border-none" src="https://gemini.google.com/app"></iframe>
+        <main class="flex-grow flex flex-col md:flex-row gap-4 p-4 overflow-hidden">
+            <div class="flex-grow md:w-2/3 h-1/2 md:h-full flex flex-col">
+                <textarea id="canvasEditor"></textarea>
+            </div>
+            <div class="flex-grow md:w-1/3 h-1/2 md:h-full bg-gray-800 rounded-lg p-4 flex flex-col overflow-hidden">
+                <h2 class="text-xl font-bold mb-4 flex-shrink-0">Canvas AI</h2>
+                <div id="canvasAiChatContainer" class="flex-grow overflow-y-auto mb-4 space-y-4 flex flex-col pr-2"></div>
+                <div class="flex-shrink-0 space-y-2">
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <button class="canvas-ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Summarize the text in the editor.">Summarize</button>
+                        <button class="canvas-ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Continue writing based on the text in the editor.">Continue</button>
+                        <button class="canvas-ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Check for grammar and spelling errors in the text.">Check Grammar</button>
+                        <button class="canvas-ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Brainstorm ideas based on the text.">Brainstorm</button>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="text" id="canvasAiInput" class="w-full bg-gray-700 border-gray-600 rounded-l-md p-3 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ask about the text...">
+                        <button id="canvasAiSendBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold p-3 rounded-r-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -578,6 +600,12 @@
                     input: document.getElementById('hubAiInput'),
                     sendBtn: document.getElementById('hubAiSendBtn'),
                 },
+                canvasAi: {
+                    chatContainer: document.getElementById('canvasAiChatContainer'),
+                    input: document.getElementById('canvasAiInput'),
+                    sendBtn: document.getElementById('canvasAiSendBtn'),
+                    actionBtns: document.querySelectorAll('.canvas-ai-action-btn'),
+                },
                 search: {
                     input: document.getElementById('searchInput'),
                     btn: document.getElementById('searchBtn'),
@@ -606,7 +634,7 @@
                 }
             };
 
-            let auth, db, editor;
+            let auth, db, editor, canvasEditor;
             let userId, currentProjectId, activeFileId = null;
             let fileStructureUnsubscribe, projectsUnsubscribe, assetsUnsubscribe, snippetsUnsubscribe;
             let fileStructure = [];
@@ -623,6 +651,9 @@
                     initDevSuiteEditors();
                     setupDevSuiteListeners(); 
                     showDevSuiteTab('breakdown');
+                }
+                if (viewName === 'canvas') {
+                    initCanvasEditor();
                 }
             }
 
@@ -784,6 +815,20 @@
                        cm.showHint();
                     }
                 });
+            }
+
+            function initCanvasEditor() {
+                if (canvasEditor) {
+                    setTimeout(() => canvasEditor.refresh(), 1);
+                    return;
+                }
+                canvasEditor = CodeMirror.fromTextArea(document.getElementById('canvasEditor'), {
+                    lineNumbers: true,
+                    theme: 'material-darker',
+                    mode: 'markdown',
+                    lineWrapping: true,
+                });
+                 setTimeout(() => canvasEditor.refresh(), 1);
             }
 
             async function selectProject(projectId, projectName, openGitPanel = false) {
@@ -1476,82 +1521,13 @@
                 ]);
             }
 
-            // --- AI Assistant (Editor Panel) ---
-            async function handleEditorAIAssist(userPrompt) {
-                if (!userPrompt.trim()) return;
-
-                addMessageToEditorAIChat(userPrompt, 'user');
-                addMessageToEditorAIChat('...', 'assistant', true); // Loading indicator
-
-                const codeContext = editor.getSelection() || editor.getValue();
-                const fullPrompt = `
-                    You are an expert code assistant.
-                    Here is the current code I'm working on:
-                    \`\`\`
-                    ${codeContext}
-                    \`\`\`
-                    Please help me with the following request: ${userPrompt}
-                `;
+            // --- AI Assistants ---
+            async function handleAIAssist(prompt, context, chatContainer, loadingId) {
+                const fullPrompt = `${context}\n\nPlease help me with the following request: ${prompt}`;
                 
-                try {
-                    let chatHistory = [{ role: "user", parts: [{ text: fullPrompt }] }];
-                    const payload = { contents: chatHistory };
-                    const apiKey = ""; // Provided by environment
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-                    
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
+                addMessageToAIChat(prompt, 'user', chatContainer);
+                addMessageToAIChat('...', 'assistant', chatContainer, true, loadingId);
 
-                    if (!response.ok) {
-                        throw new Error(`API error: ${response.statusText}`);
-                    }
-
-                    const result = await response.json();
-                    const text = result.candidates[0].content.parts[0].text;
-                    
-                    updateLastEditorAIChatMessage(text);
-
-                } catch (error) {
-                    console.error("AI Assistant Error:", error);
-                    updateLastEditorAIChatMessage(`Sorry, I encountered an error. Please check the console for details.`);
-                }
-            }
-
-            function addMessageToEditorAIChat(content, role, isLoading = false) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `ai-message ${role}`;
-                if (isLoading) {
-                    messageDiv.id = 'editor-ai-loading-indicator';
-                    messageDiv.innerHTML = `<div class="animate-pulse">● ● ●</div>`;
-                } else {
-                    content = content.replace(/```(\w+)?\n([\s\S]+?)```/g, '<pre class="bg-gray-900 p-2 rounded-md my-2"><code>$2</code></pre>');
-                    messageDiv.innerHTML = content;
-                }
-                DOM.editorAi.chatContainer.appendChild(messageDiv);
-                DOM.editorAi.chatContainer.scrollTop = DOM.editorAi.chatContainer.scrollHeight;
-            }
-            
-            function updateLastEditorAIChatMessage(content) {
-                const loadingIndicator = document.getElementById('editor-ai-loading-indicator');
-                if (loadingIndicator) {
-                    content = content.replace(/```(\w+)?\n([\s\S]+?)```/g, '<pre class="bg-gray-900 p-2 rounded-md my-2"><code>$2</code></pre>');
-                    loadingIndicator.innerHTML = content;
-                    loadingIndicator.removeAttribute('id');
-                }
-            }
-
-            // --- AI Assistant (Hub View) ---
-            async function handleHubAIAssist(userPrompt) {
-                if (!userPrompt.trim()) return;
-
-                addMessageToHubAIChat(userPrompt, 'user');
-                addMessageToHubAIChat('...', 'assistant', true);
-
-                const fullPrompt = `You are a helpful AI assistant. Please respond to the following user query: ${userPrompt}`;
-                
                 try {
                     let chatHistory = [{ role: "user", parts: [{ text: fullPrompt }] }];
                     const payload = { contents: chatHistory };
@@ -1569,30 +1545,30 @@
                     const result = await response.json();
                     const text = result.candidates[0].content.parts[0].text;
                     
-                    updateLastHubAIChatMessage(text);
+                    updateLastAIChatMessage(text, loadingId);
 
                 } catch (error) {
-                    console.error("Hub AI Assistant Error:", error);
-                    updateLastHubAIChatMessage(`Sorry, I encountered an error. Please check the console for details.`);
+                    console.error("AI Assistant Error:", error);
+                    updateLastAIChatMessage(`Sorry, I encountered an error. Please check the console for details.`, loadingId);
                 }
             }
 
-            function addMessageToHubAIChat(content, role, isLoading = false) {
+            function addMessageToAIChat(content, role, container, isLoading = false, loadingId) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `ai-message ${role}`;
                 if (isLoading) {
-                    messageDiv.id = 'hub-ai-loading-indicator';
+                    messageDiv.id = loadingId;
                     messageDiv.innerHTML = `<div class="animate-pulse">● ● ●</div>`;
                 } else {
                     content = content.replace(/```(\w+)?\n([\s\S]+?)```/g, '<pre class="bg-gray-900 p-2 rounded-md my-2"><code>$2</code></pre>');
                     messageDiv.innerHTML = content;
                 }
-                DOM.hubAi.chatContainer.appendChild(messageDiv);
-                DOM.hubAi.chatContainer.scrollTop = DOM.hubAi.chatContainer.scrollHeight;
+                container.appendChild(messageDiv);
+                container.scrollTop = container.scrollHeight;
             }
-
-            function updateLastHubAIChatMessage(content) {
-                const loadingIndicator = document.getElementById('hub-ai-loading-indicator');
+            
+            function updateLastAIChatMessage(content, loadingId) {
+                const loadingIndicator = document.getElementById(loadingId);
                 if (loadingIndicator) {
                     content = content.replace(/```(\w+)?\n([\s\S]+?)```/g, '<pre class="bg-gray-900 p-2 rounded-md my-2"><code>$2</code></pre>');
                     loadingIndicator.innerHTML = content;
@@ -1791,35 +1767,46 @@
             
             // Editor AI Listeners
             DOM.editorAi.sendBtn.onclick = () => {
-                handleEditorAIAssist(DOM.editorAi.input.value);
+                const prompt = DOM.editorAi.input.value;
+                const context = `You are an expert code assistant. Here is the current code I'm working on:\n\`\`\`\n${editor.getSelection() || editor.getValue()}\n\`\`\``;
+                handleAIAssist(prompt, context, DOM.editorAi.chatContainer, 'editor-ai-loading');
                 DOM.editorAi.input.value = '';
             };
-            DOM.editorAi.input.onkeydown = (e) => {
-                if (e.key === 'Enter') {
-                    handleEditorAIAssist(DOM.editorAi.input.value);
-                    DOM.editorAi.input.value = '';
-                }
-            };
+            DOM.editorAi.input.onkeydown = (e) => { if (e.key === 'Enter') DOM.editorAi.sendBtn.click(); };
             DOM.editorAi.actionBtns.forEach(btn => {
-                btn.onclick = () => handleEditorAIAssist(btn.dataset.prompt);
+                btn.onclick = () => {
+                     const context = `You are an expert code assistant. Here is the current code I'm working on:\n\`\`\`\n${editor.getSelection() || editor.getValue()}\n\`\`\``;
+                     handleAIAssist(btn.dataset.prompt, context, DOM.editorAi.chatContainer, 'editor-ai-loading');
+                }
             });
 
             // Hub AI Listeners
             DOM.hubAi.sendBtn.onclick = () => {
-                handleHubAIAssist(DOM.hubAi.input.value);
+                const prompt = DOM.hubAi.input.value;
+                const context = `You are a helpful AI assistant.`;
+                handleAIAssist(prompt, context, DOM.hubAi.chatContainer, 'hub-ai-loading');
                 DOM.hubAi.input.value = '';
             };
-            DOM.hubAi.input.onkeydown = (e) => {
-                if (e.key === 'Enter') {
-                    handleHubAIAssist(DOM.hubAi.input.value);
-                    DOM.hubAi.input.value = '';
-                }
+            DOM.hubAi.input.onkeydown = (e) => { if (e.key === 'Enter') DOM.hubAi.sendBtn.click(); };
+
+            // Canvas AI Listeners
+            DOM.canvasAi.sendBtn.onclick = () => {
+                const prompt = DOM.canvasAi.input.value;
+                const context = `You are a helpful writing assistant. Here is the text from the editor:\n\n${canvasEditor.getValue()}`;
+                handleAIAssist(prompt, context, DOM.canvasAi.chatContainer, 'canvas-ai-loading');
+                DOM.canvasAi.input.value = '';
             };
+            DOM.canvasAi.input.onkeydown = (e) => { if (e.key === 'Enter') DOM.canvasAi.sendBtn.click(); };
+            DOM.canvasAi.actionBtns.forEach(btn => {
+                 btn.onclick = () => {
+                     const context = `You are a helpful writing assistant. Here is the text from the editor:\n\n${canvasEditor.getValue()}`;
+                     handleAIAssist(btn.dataset.prompt, context, DOM.canvasAi.chatContainer, 'canvas-ai-loading');
+                }
+            });
+
 
             DOM.search.btn.onclick = handleProjectSearch;
-            DOM.search.input.onkeydown = (e) => {
-                if (e.key === 'Enter') handleProjectSearch();
-            };
+            DOM.search.input.onkeydown = (e) => { if (e.key === 'Enter') handleProjectSearch(); };
             DOM.search.results.addEventListener('click', (e) => {
                 const item = e.target.closest('.search-result-item');
                 if (item) {
