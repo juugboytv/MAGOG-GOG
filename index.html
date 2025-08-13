@@ -37,19 +37,18 @@
 
 
     <style>
-        :root { --header-height: 4rem; --footer-height: 3.5rem; }
+        :root { --header-height: 4rem; --sidebar-width: 4.5rem; }
         html, body { height: 100%; overflow: hidden; }
         body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         .view { display: none; height: 100%; }
         .view.active { display: flex; flex-direction: column; }
-        .main-content { height: calc(100vh - var(--header-height) - var(--footer-height)); }
-        @media (min-width: 768px) { .main-content { height: calc(100vh - var(--header-height)); } }
+        .main-content { height: calc(100vh - var(--header-height)); }
         .CodeMirror { height: 100%; font-size: 14px; border-radius: 0.5rem; }
         .file-item-container, .folder-item-container { transition: background-color: 0.2s; }
         .file-item-container:hover, .folder-item-container:hover { background-color: #374151; }
         .file-item-container.selected, .folder-item-container.selected { background-color: #4338ca; }
         .folder-content { padding-left: 1.25rem; border-left: 1px solid #374151; margin-left: 0.625rem;}
-        .bottom-nav-btn.active { color: #6366f1; border-top-color: #6366f1; }
+        .sidebar-btn.active { color: #6366f1; background-color: #374151; }
         .context-menu { position: fixed; z-index: 1000; border-radius: 0.5rem; }
         .context-menu-item { padding: 0.75rem 1.25rem; cursor: pointer; color: white; display: flex; align-items: center; white-space: nowrap; }
         .context-menu-item:hover { background-color: rgba(255, 255, 255, 0.1); }
@@ -97,6 +96,7 @@
         .delete-asset-btn { position: absolute; top: 0.5rem; right: 0.5rem; background-color: rgba(0,0,0,0.5); border-radius: 9999px; padding: 0.25rem; display: none; }
         .group:hover .delete-asset-btn { display: block; }
         .delete-asset-btn:hover { background-color: rgba(239, 68, 68, 0.8); }
+        .editor-panel-container { width: calc(100% - var(--sidebar-width)); }
     </style>
 </head>
 <body class="bg-gray-900 text-white h-screen flex flex-col items-center justify-center p-0 md:p-4">
@@ -340,118 +340,120 @@
                 <button id="saveButton" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200">Save</button>
             </div>
         </header>
-        <main class="main-content flex-grow flex md:flex-row flex-col overflow-hidden">
-            <div id="fileExplorerPanel" class="bg-gray-800 p-2 overflow-y-auto h-full w-full md:w-64 md:flex-shrink-0">
-                 <div class="flex justify-end items-center mb-2 p-2 space-x-2">
-                    <button id="uploadFileBtn" class="p-2 bg-gray-700 hover:bg-gray-600 rounded-md" title="Upload File"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></button>
-                    <button id="newFileBtn" class="p-2 bg-gray-700 hover:bg-gray-600 rounded-md" title="New File"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></button>
-                    <button id="newFolderBtn" class="p-2 bg-gray-700 hover:bg-gray-600 rounded-md" title="New Folder"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg></button>
-                </div>
-                <div id="fileTree"></div>
-            </div>
-            <div id="editorPanel" class="flex-col md:flex-1 h-full w-full hidden md:flex"><div id="editorWrapper" class="flex-grow relative h-full"><textarea id="codeEditor"></textarea></div></div>
-            <div id="previewPanel" class="bg-white h-full w-full hidden md:flex md:flex-1"><iframe id="previewFrame" class="w-full h-full border-none" sandbox="allow-scripts allow-same-origin"></iframe></div>
-            <div id="assetsPanel" class="bg-gray-800 p-4 overflow-y-auto h-full w-full hidden md:flex md:flex-col">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-bold">Project Assets</h2>
-                    <div class="flex space-x-2">
-                        <button id="newAssetFolderBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">New Folder</button>
-                        <button id="uploadAssetBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Upload</button>
+        <main class="main-content flex-grow flex flex-row overflow-hidden">
+            <nav class="bg-gray-800 border-r border-gray-700 flex flex-col justify-start items-center p-2 space-y-4 w-[var(--sidebar-width)] flex-shrink-0"></nav>
+            <div class="editor-panel-container h-full flex-grow">
+                <div id="fileExplorerPanel" class="bg-gray-800 p-2 overflow-y-auto h-full w-full">
+                    <div class="flex justify-end items-center mb-2 p-2 space-x-2">
+                        <button id="uploadFileBtn" class="p-2 bg-gray-700 hover:bg-gray-600 rounded-md" title="Upload File"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></button>
+                        <button id="newFileBtn" class="p-2 bg-gray-700 hover:bg-gray-600 rounded-md" title="New File"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></button>
+                        <button id="newFolderBtn" class="p-2 bg-gray-700 hover:bg-gray-600 rounded-md" title="New Folder"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg></button>
                     </div>
+                    <div id="fileTree"></div>
                 </div>
-                <div id="assetList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-            </div>
-            <div id="aiPanel" class="bg-gray-800 p-4 h-full w-full hidden md:flex md:flex-col overflow-hidden">
-                <h2 class="text-xl font-bold mb-4 flex-shrink-0">AI Code Assistant</h2>
-                <div id="aiChatContainer" class="flex-grow overflow-y-auto mb-4 space-y-4 flex flex-col pr-2"></div>
-                <div class="flex-shrink-0 space-y-2">
-                    <div class="grid grid-cols-2 gap-2 text-sm">
-                        <button class="ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Explain the selected code.">Explain Code</button>
-                        <button class="ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Find potential bugs in the selected code.">Find Bugs</button>
-                        <button class="ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Optimize the selected code.">Optimize</button>
-                        <button class="ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Add comments to the selected code.">Add Comments</button>
-                    </div>
-                    <div class="flex items-center">
-                        <input type="text" id="aiInput" class="w-full bg-gray-700 border-gray-600 rounded-l-md p-3 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ask about your code...">
-                        <button id="aiSendBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold p-3 rounded-r-md">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div id="searchPanel" class="bg-gray-800 p-4 h-full w-full hidden md:flex md:flex-col">
-                <h2 class="text-xl font-bold mb-4 flex-shrink-0">Project Search</h2>
-                <div class="flex items-center mb-4">
-                    <input type="text" id="searchInput" class="w-full bg-gray-700 border-gray-600 rounded-l-md p-3 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="Search across all files...">
-                    <button id="searchBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold p-3 rounded-r-md">Search</button>
-                </div>
-                <div id="searchResults" class="flex-grow overflow-y-auto pr-2"></div>
-            </div>
-             <div id="snippetsPanel" class="bg-gray-800 p-4 h-full w-full hidden md:flex md:flex-col">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-bold">Code Snippets</h2>
-                    <button id="newSnippetBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">New Snippet</button>
-                </div>
-                <div id="snippetList" class="flex-grow overflow-y-auto pr-2 space-y-2"></div>
-            </div>
-            <div id="gitPanel" class="bg-gray-800 p-4 overflow-y-auto h-full w-full hidden md:flex md:flex-col">
-                <h2 class="text-xl font-bold mb-4 flex-shrink-0">Git Control</h2>
-                <div id="gitConnectView">
-                    <h3 class="text-lg font-semibold mb-2">Connect to GitHub</h3>
-                    <p class="text-sm text-gray-400 mb-4">Enter a <a href="https://github.com/settings/tokens/new?scopes=repo" target="_blank" class="text-indigo-400 hover:underline">Personal Access Token</a> to connect your account.</p>
-                    <div class="space-y-4">
-                        <div>
-                            <label for="githubPat" class="block text-sm font-medium text-gray-300">Personal Access Token (PAT)</label>
-                            <input type="password" id="githubPat" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md p-3 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="ghp_...">
+                <div id="editorPanel" class="flex-col h-full w-full hidden"><div id="editorWrapper" class="flex-grow relative h-full"><textarea id="codeEditor"></textarea></div></div>
+                <div id="previewPanel" class="bg-white h-full w-full hidden"><iframe id="previewFrame" class="w-full h-full border-none" sandbox="allow-scripts allow-same-origin"></iframe></div>
+                <div id="assetsPanel" class="bg-gray-800 p-4 overflow-y-auto h-full w-full hidden flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">Project Assets</h2>
+                        <div class="flex space-x-2">
+                            <button id="newAssetFolderBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">New Folder</button>
+                            <button id="uploadAssetBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">Upload</button>
                         </div>
-                        <button id="connectGitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg">Connect</button>
                     </div>
+                    <div id="assetList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
-                <div id="gitMainView" class="hidden flex flex-col h-full">
-                     <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                <div id="aiPanel" class="bg-gray-800 p-4 h-full w-full hidden flex-col overflow-hidden">
+                    <h2 class="text-xl font-bold mb-4 flex-shrink-0">AI Code Assistant</h2>
+                    <div id="aiChatContainer" class="flex-grow overflow-y-auto mb-4 space-y-4 flex flex-col pr-2"></div>
+                    <div class="flex-shrink-0 space-y-2">
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <button class="ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Explain the selected code.">Explain Code</button>
+                            <button class="ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Find potential bugs in the selected code.">Find Bugs</button>
+                            <button class="ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Optimize the selected code.">Optimize</button>
+                            <button class="ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Add comments to the selected code.">Add Comments</button>
+                        </div>
                         <div class="flex items-center">
-                            <img id="githubAvatar" class="h-10 w-10 rounded-full mr-3">
+                            <input type="text" id="aiInput" class="w-full bg-gray-700 border-gray-600 rounded-l-md p-3 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ask about your code...">
+                            <button id="aiSendBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold p-3 rounded-r-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="searchPanel" class="bg-gray-800 p-4 h-full w-full hidden flex-col">
+                    <h2 class="text-xl font-bold mb-4 flex-shrink-0">Project Search</h2>
+                    <div class="flex items-center mb-4">
+                        <input type="text" id="searchInput" class="w-full bg-gray-700 border-gray-600 rounded-l-md p-3 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="Search across all files...">
+                        <button id="searchBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold p-3 rounded-r-md">Search</button>
+                    </div>
+                    <div id="searchResults" class="flex-grow overflow-y-auto pr-2"></div>
+                </div>
+                 <div id="snippetsPanel" class="bg-gray-800 p-4 h-full w-full hidden flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">Code Snippets</h2>
+                        <button id="newSnippetBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg">New Snippet</button>
+                    </div>
+                    <div id="snippetList" class="flex-grow overflow-y-auto pr-2 space-y-2"></div>
+                </div>
+                <div id="gitPanel" class="bg-gray-800 p-4 overflow-y-auto h-full w-full hidden flex-col">
+                    <h2 class="text-xl font-bold mb-4 flex-shrink-0">Git Control</h2>
+                    <div id="gitConnectView">
+                        <h3 class="text-lg font-semibold mb-2">Connect to GitHub</h3>
+                        <p class="text-sm text-gray-400 mb-4">Enter a <a href="https://github.com/settings/tokens/new?scopes=repo" target="_blank" class="text-indigo-400 hover:underline">Personal Access Token</a> to connect your account.</p>
+                        <div class="space-y-4">
                             <div>
-                                <p class="font-semibold">Connected as</p>
-                                <p id="githubUsername" class="text-indigo-400"></p>
+                                <label for="githubPat" class="block text-sm font-medium text-gray-300">Personal Access Token (PAT)</label>
+                                <input type="password" id="githubPat" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md p-3 text-white focus:ring-indigo-500 focus:border-indigo-500" placeholder="ghp_...">
+                            </div>
+                            <button id="connectGitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg">Connect</button>
+                        </div>
+                    </div>
+                    <div id="gitMainView" class="hidden flex flex-col h-full">
+                         <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                            <div class="flex items-center">
+                                <img id="githubAvatar" class="h-10 w-10 rounded-full mr-3">
+                                <div>
+                                    <p class="font-semibold">Connected as</p>
+                                    <p id="githubUsername" class="text-indigo-400"></p>
+                                </div>
+                            </div>
+                            <button id="disconnectGitBtn" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded-lg">Disconnect</button>
+                        </div>
+                        <div class="mb-4 flex-shrink-0">
+                            <label for="repoSelect" class="block text-sm font-medium text-gray-300">Repository</label>
+                            <select id="repoSelect" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white focus:ring-indigo-500 focus:border-indigo-500">
+                                <option>Select a repository...</option>
+                            </select>
+                        </div>
+                        <div id="gitActionButtons" class="mb-4 flex space-x-2">
+                            <button id="pullBtn" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 rounded-lg">Pull</button>
+                            <button id="pushBtn" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 rounded-lg">Push</button>
+                        </div>
+                        <div class="flex-grow overflow-y-auto space-y-4 pr-2">
+                            <div>
+                                <h4 class="text-sm font-bold uppercase text-gray-400 mb-2">Changes</h4>
+                                <div id="gitChangesList" class="space-y-2"></div>
+                            </div>
+                             <div>
+                                <h4 class="text-sm font-bold uppercase text-gray-400 mb-2">Staged Changes</h4>
+                                <div id="gitStagedList" class="space-y-2"></div>
+                            </div>
+                             <div>
+                                <h4 class="text-sm font-bold uppercase text-gray-400 mb-2">Commit History</h4>
+                                <div id="commitHistory" class="space-y-2 text-gray-500 text-sm">
+                                    <p>Commit history will appear here...</p>
+                                </div>
                             </div>
                         </div>
-                        <button id="disconnectGitBtn" class="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded-lg">Disconnect</button>
-                    </div>
-                    <div class="mb-4 flex-shrink-0">
-                        <label for="repoSelect" class="block text-sm font-medium text-gray-300">Repository</label>
-                        <select id="repoSelect" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white focus:ring-indigo-500 focus:border-indigo-500">
-                            <option>Select a repository...</option>
-                        </select>
-                    </div>
-                    <div id="gitActionButtons" class="mb-4 flex space-x-2">
-                        <button id="pullBtn" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 rounded-lg">Pull</button>
-                        <button id="pushBtn" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 rounded-lg">Push</button>
-                    </div>
-                    <div class="flex-grow overflow-y-auto space-y-4 pr-2">
-                        <div>
-                            <h4 class="text-sm font-bold uppercase text-gray-400 mb-2">Changes</h4>
-                            <div id="gitChangesList" class="space-y-2"></div>
+                        <div class="mt-4 border-t border-gray-700 pt-4 flex-shrink-0">
+                            <textarea id="commitMessage" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white mb-2" placeholder="Commit message..." rows="2"></textarea>
+                            <button id="commitBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg">Commit</button>
                         </div>
-                         <div>
-                            <h4 class="text-sm font-bold uppercase text-gray-400 mb-2">Staged Changes</h4>
-                            <div id="gitStagedList" class="space-y-2"></div>
-                        </div>
-                         <div>
-                            <h4 class="text-sm font-bold uppercase text-gray-400 mb-2">Commit History</h4>
-                            <div id="commitHistory" class="space-y-2 text-gray-500 text-sm">
-                                <p>Commit history will appear here...</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-4 border-t border-gray-700 pt-4 flex-shrink-0">
-                        <textarea id="commitMessage" class="w-full bg-gray-700 border-gray-600 rounded-md p-2 text-white mb-2" placeholder="Commit message..." rows="2"></textarea>
-                        <button id="commitBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg">Commit</button>
                     </div>
                 </div>
             </div>
         </main>
-        <nav class="bg-gray-800 border-t border-gray-700 flex justify-around items-center h-[var(--footer-height)] flex-shrink-0 md:hidden"></nav>
     </div>
     
     <div id="modalContainer" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"></div>
@@ -542,7 +544,7 @@
                 fileTree: document.getElementById('fileTree'),
                 saveButton: document.getElementById('saveButton'),
                 previewFrame: document.getElementById('previewFrame'),
-                bottomNav: document.querySelector('#editorView nav'),
+                sidebarNav: document.querySelector('#editorView nav'),
                 modalContainer: document.getElementById('modalContainer'),
                 contextMenu: document.getElementById('contextMenu'),
                 headerTitle: document.querySelector('#editorView #headerTitle'),
@@ -789,7 +791,7 @@
                 DOM.headerTitle.textContent = projectName;
                 showView('editor');
                 initEditor();
-                setupMobileNav();
+                setupSidebarNav();
                 
                 if (fileStructureUnsubscribe) fileStructureUnsubscribe();
                 const filesRef = db.collection("projects").doc(projectId).collection("files");
@@ -818,7 +820,7 @@
                 await batch.commit();
             }
 
-            function setupMobileNav() {
+            function setupSidebarNav() {
                 const navItems = [
                     { id: 'fileExplorerPanel', icon: 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z', label: 'Files' }, 
                     { id: 'searchPanel', icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z', label: 'Search'},
@@ -829,17 +831,17 @@
                     { id: 'previewPanel', icon: 'M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z', label: 'Preview' },
                     { id: 'gitPanel', icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM9 11a1 1 0 100-2 1 1 0 000 2z', label: 'Git' }
                 ];
-                DOM.bottomNav.innerHTML = navItems.map(item => `<button data-panel="${item.id}" class="bottom-nav-btn flex-1 flex flex-col items-center justify-center h-full text-gray-400 border-t-2 border-transparent"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${item.icon}" /></svg><span class="text-xs">${item.label}</span></button>`).join('');
-                document.querySelectorAll('.bottom-nav-btn').forEach(btn => btn.addEventListener('click', () => showPanel(btn.dataset.panel)));
+                DOM.sidebarNav.innerHTML = navItems.map(item => `<button data-panel="${item.id}" class="sidebar-btn w-full flex flex-col items-center justify-center p-2 text-gray-400 rounded-lg hover:bg-gray-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${item.icon}" /></svg><span class="text-xs">${item.label}</span></button>`).join('');
+                document.querySelectorAll('.sidebar-btn').forEach(btn => btn.addEventListener('click', () => showPanel(btn.dataset.panel)));
                 showPanel('fileExplorerPanel');
             }
 
             function showPanel(panelId) {
-                Object.values(DOM.editorPanels).forEach(p => p.classList.add('hidden', 'md:flex'));
+                Object.values(DOM.editorPanels).forEach(p => p.classList.add('hidden'));
                 DOM.editorPanels[panelId].classList.remove('hidden');
-                if (window.innerWidth < 768) {
-                    document.querySelectorAll('.bottom-nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.panel === panelId));
-                }
+                DOM.editorPanels[panelId].classList.add('flex'); // Ensure flex is active for panels
+                document.querySelectorAll('.sidebar-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.panel === panelId));
+                
                 if (panelId === 'editorPanel' && editor) setTimeout(() => editor.refresh(), 1);
                 if (panelId === 'previewPanel') runProject();
             }
