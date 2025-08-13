@@ -1523,6 +1523,7 @@
 
             // --- AI Assistants ---
             async function handleAIAssist(prompt, context, chatContainer, loadingId) {
+                if (!prompt.trim()) return;
                 const fullPrompt = `${context}\n\nPlease help me with the following request: ${prompt}`;
                 
                 addMessageToAIChat(prompt, 'user', chatContainer);
@@ -1543,13 +1544,16 @@
                     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
 
                     const result = await response.json();
+                    if (!result.candidates || !result.candidates[0].content.parts[0].text) {
+                         throw new Error("Invalid API response structure");
+                    }
                     const text = result.candidates[0].content.parts[0].text;
                     
                     updateLastAIChatMessage(text, loadingId);
 
                 } catch (error) {
                     console.error("AI Assistant Error:", error);
-                    updateLastAIChatMessage(`Sorry, I encountered an error. Please check the console for details.`, loadingId);
+                    updateLastAIChatMessage(`Sorry, I encountered an error. Please check the console for details. Error: ${error.message}`, loadingId);
                 }
             }
 
