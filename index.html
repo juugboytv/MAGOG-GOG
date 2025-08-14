@@ -5,15 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>MAGOG IDE</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- CodeMirror CSS -->
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/material-darker.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/hint/show-hint.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/lint/lint.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/foldgutter.min.css">
 
-
-    <!-- CodeMirror JS -->
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/xml/xml.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
@@ -21,7 +20,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/htmlmixed/htmlmixed.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/markdown/markdown.min.js"></script>
     
-    <!-- CodeMirror Addons -->
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/hint/show-hint.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/hint/xml-hint.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/hint/html-hint.min.js"></script>
@@ -105,7 +104,7 @@
     <input type="file" id="fileUploader" class="hidden" accept=".html,.css,.js,.txt,.md,.json">
     <input type="file" id="assetUploader" class="hidden" accept=".svg,.json,.txt,.md">
 
-    <!-- Auth View -->
+    
     <div id="authView" class="view w-full max-w-md items-center justify-center" style="background-image: url('https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center;">
          <div class="bg-gray-900 bg-opacity-75 rounded-none md:rounded-2xl shadow-2xl p-8 border-y md:border border-gray-700 h-full md:h-auto w-full flex flex-col justify-center">
             <div class="mb-8 text-center"><h2 class="text-3xl font-bold">Login to MAGOG</h2></div>
@@ -127,7 +126,7 @@
          </div>
     </div>
 
-    <!-- Home Hub View -->
+    
     <div id="homeView" class="view w-full h-full overflow-y-auto">
         <div class="w-full max-w-6xl mx-auto flex flex-col min-h-full p-4 py-8">
             <header class="text-center mb-12">
@@ -167,13 +166,16 @@
         </div>
     </div>
 
-    <!-- Canvas View -->
+    
     <div id="canvasView" class="view w-full h-full">
         <header class="bg-gray-800 p-4 flex justify-between items-center border-b border-gray-700 flex-shrink-0 h-[var(--header-height)]">
             <div class="flex items-center">
                  <button id="canvasViewBackBtn" class="p-2 rounded-full hover:bg-gray-700 mr-2" title="Back to Home"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg></button>
                 <h1 class="text-2xl font-bold">MAGOG Canvas</h1>
             </div>
+            <button id="canvasAiSettingsBtn" class="p-2 rounded-full hover:bg-gray-700" title="AI Settings">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </button>
         </header>
         <main class="flex-grow flex flex-col md:flex-row gap-4 p-4 overflow-hidden">
             <div class="flex-grow md:w-2/3 h-1/2 md:h-full flex flex-col">
@@ -182,7 +184,7 @@
             <div class="flex-grow md:w-1/3 h-1/2 md:h-full bg-gray-800 rounded-lg p-4 flex flex-col overflow-hidden">
                 <h2 class="text-xl font-bold mb-4 flex-shrink-0">Canvas AI</h2>
                 <div id="canvasAiChatContainer" class="flex-grow overflow-y-auto mb-4 space-y-4 flex flex-col pr-2"></div>
-                <div class="flex-shrink-0 space-y-2">
+                <div class="flex-shrink-0 space-y-2 pb-4">
                     <div class="grid grid-cols-2 gap-2 text-sm">
                         <button class="canvas-ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Summarize the text in the editor.">Summarize</button>
                         <button class="canvas-ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Continue writing based on the text in the editor.">Continue</button>
@@ -200,17 +202,20 @@
         </main>
     </div>
 
-    <!-- AI View -->
+    
     <div id="aiView" class="view w-full h-full">
         <header class="bg-gray-800 p-4 flex justify-between items-center border-b border-gray-700 flex-shrink-0 h-[var(--header-height)]">
             <div class="flex items-center">
                  <button id="aiViewBackBtn" class="p-2 rounded-full hover:bg-gray-700 mr-2" title="Back to Home"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg></button>
                 <h1 class="text-2xl font-bold">AI Assistant</h1>
             </div>
+             <button id="hubAiSettingsBtn" class="p-2 rounded-full hover:bg-gray-700" title="AI Settings">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </button>
         </header>
-        <main class="flex-grow flex flex-col p-4 md:p-6 overflow-hidden">
+        <main class="flex-grow flex flex-col p-4 md:p-6 pb-16 md:pb-6 overflow-hidden">
             <div id="hubAiChatContainer" class="flex-grow overflow-y-auto mb-4 space-y-4 flex flex-col pr-2">
-                <!-- AI Messages will be appended here -->
+                
                 <div class="ai-message assistant">Hello! How can I help you today?</div>
             </div>
             <div class="flex-shrink-0 space-y-2">
@@ -224,7 +229,7 @@
         </main>
     </div>
 
-    <!-- DevSuite View -->
+    
     <div id="devSuiteView" class="view w-full h-full">
         <header class="bg-gray-800 p-4 flex justify-between items-center border-b border-gray-700 flex-shrink-0 h-[var(--header-height)]">
             <div class="flex items-center">
@@ -239,7 +244,7 @@
                 <button data-tab="merge" class="devsuite-tab flex-1 py-2 text-gray-400 font-medium">Gemini Canvas</button>
             </div>
             
-            <!-- Breakdown Panel -->
+            
             <div id="breakdownPanel" class="devsuite-panel space-y-6">
                  <div>
                     <label class="block text-lg font-medium text-gray-300 mb-2">1. Get Combined Code</label>
@@ -269,7 +274,7 @@
                 </div>
             </div>
 
-            <!-- Combine Panel -->
+            
             <div id="combinePanel" class="devsuite-panel space-y-6">
                  <div>
                     <label class="block text-lg font-medium text-gray-300 mb-2">1. Add Your Code</label>
@@ -310,7 +315,7 @@
                 </div>
             </div>
             
-            <!-- Merge Panel -->
+            
             <div id="mergePanel" class="devsuite-panel space-y-6">
                 <div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -336,7 +341,7 @@
         </main>
     </div>
 
-    <!-- Project Dashboard View -->
+    
     <div id="dashboardView" class="view w-full h-full">
         <header class="bg-gray-800 p-4 flex justify-between items-center border-b border-gray-700 flex-shrink-0">
              <div class="flex items-center">
@@ -350,7 +355,7 @@
         <main id="projectList" class="flex-grow p-4 md:p-8 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></main>
     </div>
 
-    <!-- Editor View -->
+    
     <div id="editorView" class="view w-full h-full">
         <header class="bg-gray-800 p-3 flex justify-between items-center border-b border-gray-700 h-[var(--header-height)] flex-shrink-0 glassmorphism">
             <div class="flex items-center">
@@ -385,10 +390,15 @@
                     </div>
                     <div id="assetList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
-                <div id="aiPanel" class="bg-gray-800 p-4 h-full w-full hidden flex-col overflow-hidden">
-                    <h2 class="text-xl font-bold mb-4 flex-shrink-0">AI Code Assistant</h2>
-                    <div id="aiChatContainer" class="flex-grow overflow-y-auto mb-4 space-y-4 flex flex-col pr-2"></div>
-                    <div class="flex-shrink-0 space-y-2">
+                <div id="aiPanel" class="bg-gray-800 h-full w-full hidden flex flex-col">
+                    <div class="p-4 flex justify-between items-center flex-shrink-0">
+                        <h2 class="text-xl font-bold">AI Code Assistant</h2>
+                        <button id="editorAiSettingsBtn" class="p-2 rounded-full hover:bg-gray-700" title="AI Settings">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        </button>
+                    </div>
+                    <div id="aiChatContainer" class="flex-grow overflow-y-auto mb-4 space-y-4 flex flex-col px-4"></div>
+                    <div class="flex-shrink-0 space-y-2 px-4 pb-8">
                         <div class="grid grid-cols-2 gap-2 text-sm">
                             <button class="ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Explain the selected code.">Explain Code</button>
                             <button class="ai-action-btn bg-gray-700 hover:bg-gray-600 p-2 rounded-md" data-prompt="Find potential bugs in the selected code.">Find Bugs</button>
@@ -593,18 +603,21 @@
                     chatContainer: document.getElementById('aiChatContainer'),
                     input: document.getElementById('aiInput'),
                     sendBtn: document.getElementById('aiSendBtn'),
-                    actionBtns: document.querySelectorAll('.ai-action-btn'),
+                    actionBtns: document.querySelectorAll('#aiPanel .ai-action-btn'),
+                    settingsBtn: document.getElementById('editorAiSettingsBtn'),
                 },
                 hubAi: {
                     chatContainer: document.getElementById('hubAiChatContainer'),
                     input: document.getElementById('hubAiInput'),
                     sendBtn: document.getElementById('hubAiSendBtn'),
+                    settingsBtn: document.getElementById('hubAiSettingsBtn'),
                 },
                 canvasAi: {
                     chatContainer: document.getElementById('canvasAiChatContainer'),
                     input: document.getElementById('canvasAiInput'),
                     sendBtn: document.getElementById('canvasAiSendBtn'),
-                    actionBtns: document.querySelectorAll('.canvas-ai-action-btn'),
+                    actionBtns: document.querySelectorAll('#canvasView .canvas-ai-action-btn'),
+                    settingsBtn: document.getElementById('canvasAiSettingsBtn'),
                 },
                 search: {
                     input: document.getElementById('searchInput'),
@@ -1210,7 +1223,7 @@
 
                 const mergedCss = `${currentParts.css}\n\n/* --- New CSS --- */\n${newParts.css}`;
                 const mergedJs = `${currentParts.js}\n\n// --- New JS ---\n${newParts.js}`;
-                const mergedHtml = currentParts.html.replace('</body>', `<!-- New HTML -->\n${newParts.html}\n</body>`);
+                const mergedHtml = currentParts.html.replace('</body>', `\n\n<!-- --- New HTML --- -->\n${newParts.html}\n</body>`);
 
                 let finalCode = mergedHtml;
                 if (mergedCss.trim()) finalCode = finalCode.replace('</head>', `    <style>\n${mergedCss}\n</style>\n</head>`);
@@ -1522,7 +1535,46 @@
             }
 
             // --- AI Assistants ---
+            function showApiKeyModal() {
+                const content = `
+                    <p class="text-gray-400 text-sm mb-4">To use the AI features on a hosted site, please provide your Google AI Studio API key. This key is stored only in your browser's local storage.</p>
+                    <div>
+                        <label for="apiKeyInput" class="block text-sm font-medium text-gray-300">Gemini API Key</label>
+                        <input type="password" id="apiKeyInput" class="mt-1 block w-full bg-gray-900 border-gray-600 rounded-md p-2 text-white" placeholder="Enter your key...">
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">You can get a key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-indigo-400 hover:underline">Google AI Studio</a>.</p>
+                `;
+                showModal('AI Assistant Setup', content, [
+                    { text: 'Cancel', class: 'px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-700 text-sm', onClick: closeModal },
+                    { text: 'Save Key', class: 'px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-sm', onClick: () => {
+                        const key = document.getElementById('apiKeyInput').value.trim();
+                        if (key) {
+                            localStorage.setItem('geminiApiKey', key);
+                            alert('API Key saved successfully!');
+                            closeModal();
+                        } else {
+                            alert('Please enter a valid API key.');
+                        }
+                    }}
+                ]);
+            }
+
+            function getApiKey() {
+                const key = localStorage.getItem('geminiApiKey');
+                if (!key) {
+                    showApiKeyModal();
+                    return null;
+                }
+                return key;
+            }
+
             async function handleAIAssist(prompt, context, chatContainer, loadingId) {
+                const apiKey = getApiKey();
+                if (!apiKey) {
+                    addMessageToAIChat('Please set your API key in the AI settings to use this feature.', 'assistant', chatContainer);
+                    return;
+                }
+                
                 if (!prompt.trim()) return;
                 const fullPrompt = `${context}\n\nPlease help me with the following request: ${prompt}`;
                 
@@ -1532,7 +1584,6 @@
                 try {
                     let chatHistory = [{ role: "user", parts: [{ text: fullPrompt }] }];
                     const payload = { contents: chatHistory };
-                    const apiKey = ""; // Provided by environment
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                     
                     const response = await fetch(apiUrl, {
@@ -1769,6 +1820,11 @@
             DOM.assets.newFolderBtn.onclick = () => alert("Asset folder creation coming soon!");
             DOM.assetUploader.onchange = handleAssetUpload;
             
+            // AI Settings Listeners
+            DOM.editorAi.settingsBtn.onclick = showApiKeyModal;
+            DOM.hubAi.settingsBtn.onclick = showApiKeyModal;
+            DOM.canvasAi.settingsBtn.onclick = showApiKeyModal;
+
             // Editor AI Listeners
             DOM.editorAi.sendBtn.onclick = () => {
                 const prompt = DOM.editorAi.input.value;
