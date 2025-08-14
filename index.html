@@ -38,7 +38,8 @@
 
     <style>
         :root { --header-height: 4rem; --sidebar-width: 4.5rem; }
-        html, body { height: 100%; overflow: hidden; }
+        /* CHANGE #1: Removed 'overflow: hidden' to allow scrolling when content is too large for the viewport */
+        html, body { height: 100%; }
         body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         .view { display: none; height: 100%; }
         .view.active { display: flex; flex-direction: column; }
@@ -100,13 +101,13 @@
         #canvasView .CodeMirror { font-size: 16px; }
     </style>
 </head>
-<body class="bg-gray-900 text-white h-screen flex flex-col items-center justify-center p-0 md:p-4">
+<body class="bg-gray-900 text-white h-full flex flex-col items-center justify-center p-0 md:p-4">
     <input type="file" id="fileUploader" class="hidden" accept=".html,.css,.js,.txt,.md,.json">
     <input type="file" id="assetUploader" class="hidden" accept=".svg,.json,.txt,.md">
 
     
     <div id="authView" class="view w-full max-w-md items-center justify-center" style="background-image: url('https://images.unsplash.com/photo-1531366936337-7c912a4589a7?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center;">
-         <div class="bg-gray-900 bg-opacity-75 rounded-none md:rounded-2xl shadow-2xl p-8 border-y md:border border-gray-700 h-full md:h-auto w-full flex flex-col justify-center">
+        <div class="bg-gray-900 bg-opacity-75 rounded-none md:rounded-2xl shadow-2xl p-8 border-y md:border border-gray-700 h-full md:h-auto w-full flex flex-col justify-center">
             <div class="mb-8 text-center"><h2 class="text-3xl font-bold">Login to MAGOG</h2></div>
             <div class="flex border-b border-gray-700 mb-6">
                 <button id="loginSwitch" class="form-switch-btn flex-1 py-2 text-gray-400 font-medium">Login</button>
@@ -123,7 +124,7 @@
                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg">Create Account</button>
             </form>
             <div id="authMessageBox" class="mt-4 text-center text-sm text-red-400"></div>
-         </div>
+       </div>
     </div>
 
     
@@ -498,6 +499,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Your JavaScript code remains the same...
             // PASTE YOUR NEW FIREBASE CONFIG OBJECT HERE
             const firebaseConfig = {
                 apiKey: "AIzaSyD8Z_71XdH8iTn1bTgpau_VvakKAJugxtc",
@@ -1193,7 +1195,7 @@
                 const combinedCode = DOM.devSuite.breakdown.input.value;
                 if (!combinedCode.trim()) { alert("Please paste some code first."); return; }
                 const { html, css, js } = breakdownCode(combinedCode);
-                devSuiteEditors.html.setValue(html || '<!-- No HTML found -->');
+                devSuiteEditors.html.setValue(html || '');
                 devSuiteEditors.css.setValue(css || '/* No CSS found */');
                 devSuiteEditors.js.setValue(js || '// No JavaScript found');
                 DOM.devSuite.breakdown.outputContainer.classList.remove('hidden');
@@ -1206,8 +1208,8 @@
                 const jsCode = devSuiteEditors.combineJs.getValue().trim();
                 if (!htmlCode) { alert("HTML code is required to combine."); return; }
                 let combined = htmlCode;
-                if (cssCode) combined = combined.replace('</head>', `    <style>\n${cssCode}\n</style>\n</head>`);
-                if (jsCode) combined = combined.replace('</body>', `    <script>\n${jsCode}\n<\/script>\n</body>`);
+                if (cssCode) combined = combined.replace('</head>', `     <style>\n${cssCode}\n</style>\n</head>`);
+                if (jsCode) combined = combined.replace('</body>', `     <script>\n${jsCode}\n<\/script>\n</body>`);
                 devSuiteEditors.combined.setValue(combined);
                 DOM.devSuite.combine.outputContainer.classList.remove('hidden');
                 setTimeout(() => devSuiteEditors.combined.refresh(), 1);
@@ -1223,11 +1225,11 @@
 
                 const mergedCss = `${currentParts.css}\n\n/* --- New CSS --- */\n${newParts.css}`;
                 const mergedJs = `${currentParts.js}\n\n// --- New JS ---\n${newParts.js}`;
-                const mergedHtml = currentParts.html.replace('</body>', `\n\n<!-- --- New HTML --- -->\n${newParts.html}\n</body>`);
+                const mergedHtml = currentParts.html.replace('</body>', `\n\n\n${newParts.html}\n</body>`);
 
                 let finalCode = mergedHtml;
-                if (mergedCss.trim()) finalCode = finalCode.replace('</head>', `    <style>\n${mergedCss}\n</style>\n</head>`);
-                if (mergedJs.trim()) finalCode = finalCode.replace('</body>', `    <script>\n${mergedJs}\n<\/script>\n</body>`);
+                if (mergedCss.trim()) finalCode = finalCode.replace('</head>', `     <style>\n${mergedCss}\n</style>\n</head>`);
+                if (mergedJs.trim()) finalCode = finalCode.replace('</body>', `     <script>\n${mergedJs}\n<\/script>\n</body>`);
 
                 devSuiteEditors.merged.setValue(finalCode);
                 DOM.devSuite.merge.outputContainer.classList.remove('hidden');
